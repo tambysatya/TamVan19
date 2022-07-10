@@ -1,0 +1,70 @@
+name:                haskell-lcplex
+version:             0.1.0.0
+github:              "githubuser/haskell-lcplex"
+license:             BSD3
+author:              "Author name here"
+maintainer:          "example@example.com"
+copyright:           "2020 Author name here"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+# synopsis:            Short description of your package
+# category:            Web
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/githubuser/haskell-lcplex#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- mtl
+
+library:
+  source-dirs: src
+  exposed-modules: LP, IloCplex
+  other-modules:  IloCplex.IloObject.IloObjective, IloCplex.IloObject.Solver, IloCplex.IloObject.Constraint, IloCplex.IloObject.IloModel, IloCplex.IloObject.Class, IloCplex.IloObject.IloEnv, IloCplex.IloObject.Variable, IloCplex.IloObject.Solver.IloCplex, IloCplex.IloObject.IloObjective.Class, IloCplex.IloObject.Constraint.IloRange, IloCplex.IloObject.IloModel.Class, IloCplex.IloObject.Variable.IloNumVar, IloCplex.IloObject.Variable.IloBoolVar, IloCplex.IloObject, IloCplex.IloObject.IloObjective, IloCplex.IloObject.Solver, IloCplex.IloObject.Constraint, IloCplex.IloObject.IloModel, IloCplex.IloObject.Class, IloCplex.IloObject.IloEnv, IloCplex.IloObject.Variable, IloCplex.IloObject.Solver.IloCplex, IloCplex.IloObject.IloObjective.Class, IloCplex.IloObject.Constraint.IloRange, IloCplex.IloObject.IloModel.Class, IloCplex.IloObject.Variable.IloNumVar, IloCplex.IloObject.Variable.IloBoolVar, LP.Class, IloCplex.IloObject.MIPStart, IloCplex.IloObject.MIPInfoCallback IloCplex.IloObject.MIPIncumbentCallback 
+  other-extensions:    ForeignFunctionInterface, ConstrainedClassMethods
+  c-sources:
+      - cbits/IloBoolVar.cpp
+      - cbits/IloCplex.cpp 
+      - cbits/IloEnv.cpp
+      - cbits/IloModel.cpp
+      - cbits/IloNumVar.cpp 
+      - cbits/IloObjective.cpp 
+      - cbits/IloRange.cpp 
+      - cbits/MIPInfoCallback.cpp 
+      - cbits/MIPIncumbentCallback.cpp
+  extra-libraries: gomp concert ilocplex cplex m pthread stdc++
+  #cc-options:    -DNDEBUG -DIL_STD -g 
+  cc-options: -m64 -O -fPIC -fno-strict-aliasing -fexceptions -DNDEBUG -DIL_STD -ldl
+  
+  #include-dirs: /home/sat/cplex129/cplex/include /home/sat/cplex129/concert/include
+  #extra-lib-dirs: /home/sat/cplex129/cplex/lib/x86-64_linux/static_pic /home/sat/cplex129/concert/lib/x86-64_linux/static_pic
+  include-dirs: /home/sat/cplex129/cplex/include /home/sat/cplex129/concert/include
+  extra-lib-dirs: /home/sat/cplex129/cplex/lib/x86-64_linux/static_pic /home/sat/cplex129/concert/lib/x86-64_linux/static_pic
+
+executables:
+  haskell-lcplex-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - haskell-lcplex
+
+tests:
+  haskell-lcplex-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - haskell-lcplex
