@@ -4,9 +4,9 @@ module IloCplex.IloObject.IloEnv where
 import Foreign.Ptr
 import Foreign.ForeignPtr
 
-foreign import ccall unsafe "include/IloEnv.h new_iloEnv"
+foreign import ccall "include/IloEnv.h new_iloEnv"
     new_iloEnv :: IO (Ptr ())
-foreign import ccall unsafe "include/IloEnv.h &delete_iloEnv"
+foreign import ccall "include/IloEnv.h &delete_iloEnv"
     delete_iloEnv :: FunPtr(Ptr () -> IO ())
 
 

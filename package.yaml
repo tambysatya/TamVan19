@@ -1,4 +1,4 @@
-name:                haskell-lcplex
+name:                enumerating-ndpoint
 version:             0.1.0.0
 github:              "githubuser/haskell-lcplex"
 license:             BSD3
@@ -22,10 +22,16 @@ description:         Please see the README on GitHub at <https://github.com/gith
 dependencies:
 - base >= 4.7 && < 5
 - mtl
+- array >= 0.5 && < 1
+- deepseq >= 1 && < 2
+- lens
+- containers  >= 0.6 && < 1
+- time >= 1.9 && < 2
+- mono-traversable >= 1 && < 2
 
 library:
   source-dirs: src
-  exposed-modules: LP, IloCplex
+  exposed-modules: LP, IloCplex, Stats, Algorithm, Confs, Zone_RA, Tests, Design, Reopt, RestrictModel
   other-modules:  IloCplex.IloObject.IloObjective, IloCplex.IloObject.Solver, IloCplex.IloObject.Constraint, IloCplex.IloObject.IloModel, IloCplex.IloObject.Class, IloCplex.IloObject.IloEnv, IloCplex.IloObject.Variable, IloCplex.IloObject.Solver.IloCplex, IloCplex.IloObject.IloObjective.Class, IloCplex.IloObject.Constraint.IloRange, IloCplex.IloObject.IloModel.Class, IloCplex.IloObject.Variable.IloNumVar, IloCplex.IloObject.Variable.IloBoolVar, IloCplex.IloObject, IloCplex.IloObject.IloObjective, IloCplex.IloObject.Solver, IloCplex.IloObject.Constraint, IloCplex.IloObject.IloModel, IloCplex.IloObject.Class, IloCplex.IloObject.IloEnv, IloCplex.IloObject.Variable, IloCplex.IloObject.Solver.IloCplex, IloCplex.IloObject.IloObjective.Class, IloCplex.IloObject.Constraint.IloRange, IloCplex.IloObject.IloModel.Class, IloCplex.IloObject.Variable.IloNumVar, IloCplex.IloObject.Variable.IloBoolVar, LP.Class, IloCplex.IloObject.MIPStart, IloCplex.IloObject.MIPInfoCallback IloCplex.IloObject.MIPIncumbentCallback 
   other-extensions:    ForeignFunctionInterface, ConstrainedClassMethods
   c-sources:
@@ -40,15 +46,15 @@ library:
       - cbits/MIPIncumbentCallback.cpp
   extra-libraries: gomp concert ilocplex cplex m pthread stdc++
   #cc-options:    -DNDEBUG -DIL_STD -g 
-  cc-options: -m64 -O -fPIC -fno-strict-aliasing -fexceptions -DNDEBUG -DIL_STD -ldl
+  cc-options: -m64 -O -fPIC -fno-strict-aliasing -fexceptions -DNDEBUG -DIL_STD #-ldl
   
-  #include-dirs: /home/sat/cplex129/cplex/include /home/sat/cplex129/concert/include
-  #extra-lib-dirs: /home/sat/cplex129/cplex/lib/x86-64_linux/static_pic /home/sat/cplex129/concert/lib/x86-64_linux/static_pic
-  include-dirs: /home/sat/cplex129/cplex/include /home/sat/cplex129/concert/include
-  extra-lib-dirs: /home/sat/cplex129/cplex/lib/x86-64_linux/static_pic /home/sat/cplex129/concert/lib/x86-64_linux/static_pic
+  #include-dirs: /home/sat/cplex20/cplex/include /home/sat/cplex20/concert/include
+  #extra-lib-dirs: /home/sat/cplex20/cplex/lib/x86-64_linux/static_pic /home/sat/cplex20/concert/lib/x86-64_linux/static_pic
+  include-dirs: /home/sat/cplex20/cplex/include /home/sat/cplex20/concert/include
+  extra-lib-dirs: /home/sat/cplex20/cplex/lib/x86-64_linux/static_pic /home/sat/cplex20/concert/lib/x86-64_linux/static_pic
 
 executables:
-  haskell-lcplex-exe:
+  enumerating-ndpoint-exe:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -56,10 +62,10 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - haskell-lcplex
+    - enumerating-ndpoint
 
 tests:
-  haskell-lcplex-test:
+  enumerating-ndpoint-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:

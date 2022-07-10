@@ -9,9 +9,9 @@ import Foreign.ForeignPtr
 import IloCplex.IloObject.Class
 import IloCplex.IloObject.Variable
 
-foreign import ccall unsafe "include/IloModel.h new_iloModel"
+foreign import ccall "include/IloModel.h new_iloModel"
     new_iloModel :: Ptr () -> IO (Ptr ())
-foreign import ccall unsafe "include/IloModel.h &delete_iloModel"
+foreign import ccall "include/IloModel.h &delete_iloModel"
     delete_iloModel :: FunPtr(Ptr () -> IO ())
 
 

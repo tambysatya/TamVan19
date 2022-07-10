@@ -9,28 +9,28 @@ import IloCplex.IloObject.Class
 import IloCplex.IloObject.Variable
 import IloCplex.IloObject.IloModel
 
-foreign import ccall unsafe "include/IloRange.h new_iloRange"
+foreign import ccall "include/IloRange.h new_iloRange"
     new_iloRange :: Ptr () -> IO (Ptr ())
-foreign import ccall unsafe "include/IloRange.h &delete_iloRange"
+foreign import ccall "include/IloRange.h &delete_iloRange"
     delete_iloRange :: FunPtr(Ptr () -> IO ())
 
-foreign import ccall unsafe "include/IloRange.h range_setLinearCoefBool"
+foreign import ccall "include/IloRange.h range_setLinearCoefBool"
     range_setLinearCoefBool :: Ptr () -> Ptr () -> CDouble -> IO ()
-foreign import ccall unsafe "include/IloRange.h range_setLinearCoefNum"
+foreign import ccall "include/IloRange.h range_setLinearCoefNum"
     range_setLinearCoefNum :: Ptr () -> Ptr () -> CDouble -> IO ()
 
 
-foreign import ccall unsafe "include/IloRange.h range_setLB"
+foreign import ccall "include/IloRange.h range_setLB"
     range_setLB :: Ptr () -> CDouble -> IO ()
-foreign import ccall unsafe "include/IloRange.h range_setUB"
+foreign import ccall "include/IloRange.h range_setUB"
     range_setUB :: Ptr () -> CDouble -> IO ()
-foreign import ccall unsafe "include/IloRange.h range_setBounds"
+foreign import ccall "include/IloRange.h range_setBounds"
     range_setBounds :: Ptr () -> CDouble -> CDouble -> IO ()
 
-foreign import ccall unsafe "include/IloModel.h add_iloRange"
+foreign import ccall "include/IloModel.h add_iloRange"
     add_iloRange :: Ptr () -> Ptr () -> IO ()
 
-foreign import ccall unsafe "include/IloModel.h rm_iloRange"
+foreign import ccall "include/IloModel.h rm_iloRange"
     rm_iloRange :: Ptr () -> Ptr () -> IO ()
 
 newtype IloRange = IloRange (ForeignPtr ())

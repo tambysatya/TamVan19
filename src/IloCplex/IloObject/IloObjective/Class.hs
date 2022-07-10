@@ -9,23 +9,23 @@ import IloCplex.IloObject.Class
 import IloCplex.IloObject.Variable
 import IloCplex.IloObject.IloModel
 
-foreign import ccall unsafe "include/IloObjective.h new_iloObjective"
+foreign import ccall "include/IloObjective.h new_iloObjective"
     new_iloObjective :: Ptr () -> IO (Ptr ())
-foreign import ccall unsafe "include/IloObjective.h &delete_iloObjective"
+foreign import ccall "include/IloObjective.h &delete_iloObjective"
     delete_iloObjective :: FunPtr(Ptr () -> IO ())
 
-foreign import ccall unsafe "include/IloObjective.h obj_setLinearCoefBool"
+foreign import ccall "include/IloObjective.h obj_setLinearCoefBool"
     obj_setLinearCoefBool :: Ptr () -> Ptr () -> CDouble -> IO ()
-foreign import ccall unsafe "include/IloObjective.h obj_setLinearCoefNum"
+foreign import ccall "include/IloObjective.h obj_setLinearCoefNum"
     obj_setLinearCoefNum :: Ptr () -> Ptr () -> CDouble -> IO ()
-foreign import ccall unsafe "include/IloObjective.h obj_setMinimize"
+foreign import ccall "include/IloObjective.h obj_setMinimize"
     obj_setMinimize :: Ptr () -> IO ()
-foreign import ccall unsafe "include/IloObjective.h obj_setMaximize"
+foreign import ccall "include/IloObjective.h obj_setMaximize"
     obj_setMaximize :: Ptr () -> IO ()
 
-foreign import ccall unsafe "include/IloModel.h add_iloObjective"
+foreign import ccall "include/IloModel.h add_iloObjective"
     add_iloObjective :: Ptr () -> Ptr () -> IO ()
-foreign import ccall unsafe "include/IloModel.h rm_iloObjective"
+foreign import ccall "include/IloModel.h rm_iloObjective"
     rm_iloObjective :: Ptr () -> Ptr () -> IO ()
 
 

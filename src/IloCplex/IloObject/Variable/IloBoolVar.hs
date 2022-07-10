@@ -6,9 +6,9 @@ import Foreign.Ptr
 
 import IloCplex.IloObject.Class
 
-foreign import ccall unsafe "include/IloBoolVar.h new_iloBoolVar"
+foreign import ccall "include/IloBoolVar.h new_iloBoolVar"
     new_iloBoolVar :: Ptr () -> IO (Ptr ())
-foreign import ccall unsafe "include/IloBoolVar.h &delete_iloBoolVar"
+foreign import ccall "include/IloBoolVar.h &delete_iloBoolVar"
     delete_iloBoolVar :: FunPtr(Ptr () -> IO ())
 
 newtype IloBoolVar = IloBoolVar (ForeignPtr ())

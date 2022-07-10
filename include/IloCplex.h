@@ -29,6 +29,7 @@ extern "C"{
 
 //        ret->setParam(IloCplex::Param::MIP::Strategy::HeuristicFreq,-1);
 //        ret->setParam(IloCplex::Param::MIP::Strategy::RINSHeur,-1);
+//	ret->setParam(IloCplex::RootAlg,IloCplex::Network);
 
 	}
 	catch (IloException e){

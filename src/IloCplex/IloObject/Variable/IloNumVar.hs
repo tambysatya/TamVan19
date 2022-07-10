@@ -7,11 +7,11 @@ import Foreign.C.Types
 
 import IloCplex.IloObject.Class
 
-foreign import ccall unsafe "include/IloNumVar.h new_iloNumVar"
+foreign import ccall "include/IloNumVar.h new_iloNumVar"
     new_iloNumVar :: Ptr () -> IO (Ptr ())
-foreign import ccall unsafe "include/IloNumVar.h &delete_iloNumVar"
+foreign import ccall "include/IloNumVar.h &delete_iloNumVar"
     delete_iloNumVar :: FunPtr(Ptr () -> IO ())
-foreign import ccall unsafe "include/IloNumVar.h iloNumVar_setLB"
+foreign import ccall "include/IloNumVar.h iloNumVar_setLB"
     c_iloNumVar_setLB :: Ptr () -> CDouble -> IO ()
 
 newtype IloNumVar = IloNumVar (ForeignPtr ())

@@ -1,4 +1,4 @@
-{-# LANGUAGE ForeignFunctionInterface #-}
+{-# LANGUAGE TypeOperators,ForeignFunctionInterface, MagicHash #-}
 
 module IloCplex.IloObject.Solver.IloCplex where
 
@@ -10,29 +10,30 @@ import Foreign.C.String
 import IloCplex.IloObject.Class
 import IloCplex.IloObject.IloModel
 import IloCplex.IloObject.Variable
+import GHC.Exts
 
 foreign import ccall unsafe "cbits/IloCplex.cpp new_iloCplex"
     new_iloCplex :: Ptr () -> IO (Ptr ())
-foreign import ccall unsafe "include/IloCplex.h &delete_iloCplex"
+foreign import ccall "include/IloCplex.h &delete_iloCplex"
     delete_iloCplex :: FunPtr(Ptr () -> IO ())
 
-foreign import ccall unsafe "include/IloCplex.h cpx_extract"
+foreign import ccall "include/IloCplex.h cpx_extract"
     cpx_extract :: Ptr () -> Ptr () -> IO ()
-foreign import ccall unsafe "include/IloCplex.h cpx_solve"
+foreign import ccall "include/IloCplex.h cpx_solve"
     cpx_solve :: Ptr () -> IO CInt
-foreign import ccall unsafe "include/IloCplex.h cpx_populate"
+foreign import ccall "include/IloCplex.h cpx_populate"
     cpx_populate :: Ptr () -> IO CInt
 foreign import ccall unsafe "include/IloCplex.h cpx_getObjValue"
-    cpx_getObjValue :: Ptr () -> IO CDouble
+    cpx_getObjValue :: Ptr () -> IO Double
 foreign import ccall unsafe "include/IloCplex.h cpx_getValue_num"
-    cpx_getValue_num :: Ptr () -> Ptr () -> IO CDouble
+    cpx_getValue_num :: Ptr () -> Ptr () -> IO Double
 foreign import ccall unsafe "include/IloCplex.h cpx_getValue_bool"
-    cpx_getValue_bool :: Ptr () -> Ptr () -> IO CDouble
-foreign import ccall unsafe "include/IloCplex.h cpx_exportModel"
+    cpx_getValue_bool :: Ptr () -> Ptr () -> IO Double
+foreign import ccall "include/IloCplex.h cpx_exportModel"
     cpx_exportModel :: Ptr () -> CString -> IO ()
-foreign import ccall unsafe "include/IloCplex.h cpx_boolvar_setPriority"
+foreign import ccall "include/IloCplex.h cpx_boolvar_setPriority"
     cpx_boolvar_setPriority :: Ptr () -> Ptr () -> CDouble -> IO ()
-foreign import ccall unsafe "include/IloCplex.h cpx_boolvar_setDirection"
+foreign import ccall "include/IloCplex.h cpx_boolvar_setDirection"
     cpx_boolvar_setDirection :: Ptr () -> Ptr () -> CInt -> IO ()
 
 newtype IloCplex = IloCplex (ForeignPtr ())
