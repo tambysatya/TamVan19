@@ -13,6 +13,7 @@ extern "C"{
     void delete_iloBoolVar(IloBoolVar* v){v -> end(); delete v;};
 
     struct mip_start* new_mip_start(IloEnv* e){
+        std::cout << "[C] new_mip_start: entering" << std::endl;
         struct mip_start* ret = (struct mip_start*) malloc (sizeof (struct mip_start));
         ret->vars = IloBoolVarArray (*e);
         ret->vals = IloNumArray (*e);

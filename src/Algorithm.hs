@@ -141,7 +141,7 @@ restrictAlgo (yU,yI)  = do
         zones <- use raZones
         conf <- use raConf
         let siz = length zones
-        liftIO $ print zones
+        --liftIO $ print zones
         zoom raStats $ do statsLMax %= max siz
                           statsLTotal %= (+siz)
         logM $ "|U(N)| = " ++ show siz
