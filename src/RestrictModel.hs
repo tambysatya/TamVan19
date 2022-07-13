@@ -110,12 +110,10 @@ restrictExplore ptM lUB = do
                          when (isJust ptM) $ liftIO $ putStrLn $ "starting from : " ++ show (A.elems $ pointPerf $ fromJust ptM)
 
 
-                         {-
                          liftIO $ when (isJust ptM) $ do
                                          mip <- lpNew lp
                                          zipWithM_ (editMIPStart mip) (A.elems dvars) (A.elems $ pointSol $ fromJust ptM)
                                          addMIPStart (lpCpx lp) mip
-                                         -}
 
                          liftIO $ do zipWithM (\k vi -> when (k/= pi) $ setUB (objCtrs A.! k) (vi - 0.5)) [1..p] lUB
                                      lpSolve lp >>= getPoint lp ovars dvars p n
