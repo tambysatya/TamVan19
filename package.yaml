@@ -45,12 +45,8 @@ library:
       - cbits/MIPInfoCallback.cpp 
       - cbits/MIPIncumbentCallback.cpp
   extra-libraries: gomp concert ilocplex cplex m pthread stdc++
-  #cc-options:    -DNDEBUG -DIL_STD -g 
   cc-options: -m64 -O3 -fPIC -fno-strict-aliasing -fexceptions -DNDEBUG -DIL_STD #-ldl
-  #cc-options: -m64 -O -fPIC -fno-strict-aliasing -fexceptions -DNDEBUG -DIL_STD #-ldl
   
-  #include-dirs: /home/sat/cplex2210/cplex/include /home/sat/cplex2210/concert/include
-  #extra-lib-dirs: /home/sat/cplex2210/cplex/lib/x86-64_linux/static_pic /home/sat/cplex2210/concert/lib/x86-64_linux/static_pic
   include-dirs: /home/sat/cplex2210/cplex/include /home/sat/cplex2210/concert/include
   extra-lib-dirs: /home/sat/cplex2210/cplex/lib/x86-64_linux/static_pic /home/sat/cplex2210/concert/lib/x86-64_linux/static_pic
 
