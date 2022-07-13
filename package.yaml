@@ -1,10 +1,10 @@
-name:                enumerating-ndpoint
+name:                TanVan19
 version:             0.1.0.0
-github:              "githubuser/haskell-lcplex"
+github:              "tambysatya/TanVan19"
 license:             BSD3
-author:              "Author name here"
+author:              "Satya Tamby"
 maintainer:          "example@example.com"
-copyright:           "2020 Author name here"
+copyright:           "2020 None"
 
 extra-source-files:
 - README.md
@@ -55,7 +55,7 @@ library:
   extra-lib-dirs: /home/sat/cplex2210/cplex/lib/x86-64_linux/static_pic /home/sat/cplex2210/concert/lib/x86-64_linux/static_pic
 
 executables:
-  enumerating-ndpoint-exe:
+  TanVan19-exe:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -64,10 +64,10 @@ executables:
     #- -with-rtsopts=-N
     - -O3
     dependencies:
-    - enumerating-ndpoint
+    - TanVan19
 
 tests:
-  enumerating-ndpoint-test:
+  TanVan19-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
