@@ -8,7 +8,7 @@ Note that this code has **not** been used to perform the computational experimen
 
 ## Installation
 
-Install [the haskell tool stack](https://docs.haskellstack.org/) a reproducible building environment in haskell. Note that this tool is packaged in most public linux distribution and can be installed using the standard package manager.
+Install [the haskell tool stack](https://docs.haskellstack.org/) a reproducible building environment in haskell. Note that this tool is packaged in most linux distribution and can be installed using the standard package manager.
 
 Clone this repository
 
