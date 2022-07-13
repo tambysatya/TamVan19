@@ -154,6 +154,9 @@ restrictAlgo (yU,yI)  = do
                             p = snd $ A.bounds yU
                             k = fst $ view szVal zone
 
+
+                        logM $ "u=" ++ show (A.elems $ _szUB zone) ++ " k=" ++ show k 
+
                         mdl <- use raRestrictModel
                         defpts <- liftIO $ sequence $ readIORef <$> _szDefiningPoints zone AB.! k
                 
