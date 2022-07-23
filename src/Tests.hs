@@ -36,23 +36,11 @@ buildDomain env n p values lbs weights ubs = do solVars <- forM [1..n] (return $
                                               setLinearCoef ct objvar (-1)
                                               zipWithM_ (setLinearCoef ct) solVars coefs
                                               return ct
-buildLPDomain                        :: IloEnv -> Int -> Int -> [[Double]] -> [Double] -> [[Double]] -> [Double] -> IO LPDomain
-buildLPDomain env n p values lbs weights ubs = do solVars <- forM [1..n] (return $ newIloObject env) :: IO [IloNumVar]
-                                                  objVars <- forM [1..p] (return $ newIloObject env) :: IO [IloNumVar]
-                                                  matCtrs <- buildMatCtrs solVars
-                                                  objCtrs <- buildObjCtrs solVars objVars
-                                                  return $ (n,p,solVars,objVars,matCtrs ++ objCtrs)
-  where buildMatCtrs solVars = forM (zip3 lbs weights ubs) $ \(lb,coefs,ub) -> do ct <- newIloObject env
-                                                                                  setLB ct lb >> setUB ct ub
-                                                                                  zipWithM (setLinearCoef ct) solVars coefs
-                                                                                  return ct
-        buildObjCtrs solVars objVars = zipWithM (buildObjCtr solVars) objVars values
-        buildObjCtr solVars objvar coefs = do ct <- newIloObject env
-                                              setLB ct 0 >> setUB ct 0
-                                              setLinearCoef ct objvar (-1)
-                                              zipWithM_ (setLinearCoef ct) solVars coefs
-                                              return ct
 
+readDomain :: String -> IloEnv -> IO Domain
+readDomain fname env = do x <- readFile fname
+                          let (p:n:objs:lb:ctrs:ub) = lines x
+                          buildDomain env (read n) (read p) (read objs) (read lb) (read ctrs) (read $ concat ub)
 
 mainloop conf env dom = do
         rt <- getCurrentTime

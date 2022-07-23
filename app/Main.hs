@@ -39,6 +39,13 @@ main = do
       (retN,total) <- time $ mainloop conf env dom
       appendFile logfile (show n ++ ";" ++ show p ++ ";" ++ i ++";"++ _cName conf ++";" ++ show total ++ ";" ++  show (_raStats retN) ++  "\t#" ++ ins++"\n")
       writeFile "ndpts" $ show $ _raNDPT_List retN
+    ["MODO",confstyle,i,ins,logfile] -> do
+      let conf= if confstyle == "maxhv" then confMaxHV else monoConf confMaxHV
+      dom@(n,p,_,_,_) <- readDomain ins env
+      (retN,total) <- time $ mainloop conf env dom
+      appendFile logfile (show n ++ ";" ++ show p ++ ";" ++ i ++";"++ _cName conf ++";" ++ show total ++ ";" ++  show (_raStats retN) ++  "\t#" ++ ins++"\n")
+      writeFile "ndpts" $ show $ _raNDPT_List retN
 
-    otherwise -> putStrLn $ "syntax: ./main KP/AP confstyle i instance logfile"
+
+    otherwise -> putStrLn $ "syntax: ./main KP/AP/MODO confstyle i instance logfile"
 

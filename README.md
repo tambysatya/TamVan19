@@ -40,6 +40,8 @@ The binary will be copied in `~/.local/bin/TamVan19-exe`
 
 ### Multiobjective knapsack
 ### Multiobjective assigment
+### Multiobjective Discrete Optimization Problem (experimental)
+
 
 ## Citation
 If you use this code, please cite the paper:
