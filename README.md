@@ -2,6 +2,8 @@
 
 This tool is an implementation of the paper [Enumeration of the nondominated set of multiobjective discrete optimization problems, by S. Tamby and D. Vanderpooten](https://pubsonline.informs.org/doi/abs/10.1287/ijoc.2020.0953) written in Haskell.
 
+A well documented version written in python is available at [this adress](https://github.com/bayan/python-moiptimiser). We thanks the author @bayan very much for this work.
+
 ## Disclaimer
 
 
