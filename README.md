@@ -36,6 +36,8 @@ stack install
 
 On Linux, the binary will be copied in `~/.local/bin/TamVan19-exe`. Please, refer to the documentation of `stack` for *Windows* or *MacOS*.
 
+To uninstall, just remove the git repository, the binary in `~/.local/bin/TamVan19-exe`. If you want to uninstall stack, use your package manager. You may also remove `~/.stack`.
+
 ## Generating the nondominated set
 
 Simply run the command 
