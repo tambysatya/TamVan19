@@ -72,7 +72,7 @@ The log file is a *CSV* file containing differents metrics. The columns are:
 
 
 ## Instance file type
-Instances files are descripted using three types of lines:
+Instances files are descripted using two types of lines: integer or list.
 
 - Integers
 - List of doubles using the haskell syntax, *e.g.* :  
@@ -85,6 +85,7 @@ This will be referred to as `[Double]`
 [[2,5,3], [4,2,1], [5,3,1]]
 ```
 This will be referred to as `[[Double]]`
+- et cetera...
 
 Note that lists must be written **on a single line** to be properly parsed. Moreover, **no empty lines** are allowed. Sorry for this strict parser, I may relax theses constraints at some point.
 
