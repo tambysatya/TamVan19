@@ -42,7 +42,7 @@ To uninstall, just remove the git repository, the binary in `~/.local/bin/TamVan
 
 Simply run the command 
 ```
-~/local/bin/TanVan19-exe instancetype conf i instance logfile
+~/.local/bin/TanVan19-exe instancetype conf i instance logfile
 
 ```
 where
