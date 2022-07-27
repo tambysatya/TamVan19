@@ -1,6 +1,6 @@
-name:                TanVan19
+name:                TamVan19
 version:             0.1.0.0
-github:              "tambysatya/TanVan19"
+github:              "tambysatya/TamVan19"
 license:             BSD3
 author:              "Satya Tamby"
 maintainer:          "example@example.com"
@@ -51,7 +51,7 @@ library:
   extra-lib-dirs: /home/sat/cplex2210/cplex/lib/x86-64_linux/static_pic /home/sat/cplex2210/concert/lib/x86-64_linux/static_pic
 
 executables:
-  TanVan19-exe:
+  TamVan19-exe:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -60,10 +60,10 @@ executables:
     #- -with-rtsopts=-N
     - -O3
     dependencies:
-    - TanVan19
+    - TamVan19
 
 tests:
-  TanVan19-test:
+  TamVan19-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
