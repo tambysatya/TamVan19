@@ -12,6 +12,7 @@ import           System.CPUTime
 
 import           Algorithm
 import           Confs
+import Zone_RA
 
 
 import           IloCplex
@@ -48,14 +49,13 @@ mainloop conf env dom = do
 
 
         yLPts <- computeIdeal env dom
-        yUBoxed <- fmap fst <$> computeAntiIdeal env dom
+        --yUBoxed <- fmap fst <$> computeAntiIdeal env dom
         let yLBoxed = fst <$> yLPts
             yPts = snd <$> yLPts
-	    bounds = A.bounds yUBoxed
+	    bounds = A.bounds yLBoxed
 	    yL = A.listArray bounds $ AB.elems yLBoxed
-	    yU = A.listArray bounds $ AB.elems yUBoxed
 
-        ret <- restrictBuildNDPT conf (A.elems yPts) (yU,yL) env dom
+        ret <- restrictBuildNDPT conf (A.elems yPts) (Val <$> yL) env dom
 
 
         cpu' <- getCPUTime

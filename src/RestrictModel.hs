@@ -11,6 +11,7 @@ import           Control.Monad
 import           Control.Monad.State
 import           Data.Ix
 import           Data.Maybe
+import Data.List
 import Zone_RA
 import Control.DeepSeq
 
@@ -79,7 +80,7 @@ initNaive = do obj <- use rObjCtrs
                initMono
 
 {-| Set the favorized criterion in the scalarized case |-}
-favour' :: (MonadIO m) => (A.UArray Int Double,A.UArray Int Double) -> Int ->  RestrictLPT m ()
+favour' :: (MonadIO m) => (A.Array Int Double,A.Array Int Double) -> Int ->  RestrictLPT m ()
 favour' (ub,lb) k = do
               pi <- use rMinimizedCriterionIndex
               do
@@ -94,13 +95,13 @@ favour' (ub,lb) k = do
                               lp `lpRemove` (objCtrTab A.! k)
 
 {-| Returns the objective value of a point (scalarized version) \Pi'(k,u) |-}
-scalObjValue :: GlobalBounds -> Int -> Point -> Double
-scalObjValue (yU, yI) k pt = (weightK * (pointPerf pt A.! k)) + others
-	where (_,p) = A.bounds yU
-	      weightK = 1+sum [abs (pointPerf pt A.! i - yI A.! i - 1) | i <- [1..p], i /= k]
+scalObjValue :: Bound -> Int -> Point -> Double
+scalObjValue yI k pt = (weightK * (pointPerf pt A.! k)) + others
+	where (_,p) = A.bounds yI
+	      weightK = 1+sum [abs (pointPerf pt A.! i - fromVal (yI A.! i) - 1) | i <- [1..p], i /= k]
 	      others = sum [pointPerf pt A.! i | i <- [1..p], i /= k]
 
-restrictExplore :: (MonadIO m) => Maybe Point -> [Double] -> RestrictLPT m (Maybe Point)
+restrictExplore :: (MonadIO m) => Maybe Point -> [Value] -> RestrictLPT m (Maybe Point)
 restrictExplore ptM lUB = do 
                          lp <- use rModel
                          (p,n) <- (,) <$> use rNbCrit <*> use rNbDecVar
@@ -115,8 +116,16 @@ restrictExplore ptM lUB = do
                                          zipWithM_ (editMIPStart mip) (A.elems dvars) (A.elems $ pointSol $ fromJust ptM)
                                          addMIPStart (lpCpx lp) mip
 
-                         liftIO $ do zipWithM (\k vi -> when (k/= pi) $ setUB (objCtrs A.! k) (vi - 0.5)) [1..p] lUB
-                                     lpSolve lp >>= getPoint lp ovars dvars p n
+			 let (bounded, unbounded) = partition ((/= M) . snd) . filter ((/= pi) . fst) $ zip [1..p] lUB
+
+			 ret <- liftIO $ do 
+				forM bounded $ \(k,vi) -> setUB (objCtrs A.! k) (fromVal vi - 0.5)
+				forM unbounded $ \(k,_) -> lp `lpRemove` (objCtrs A.! k)
+				lpSolve lp >>= getPoint lp ovars dvars p n
+			 liftIO $ forM unbounded $ \(k,_) -> lp `lpAdd` (objCtrs A.! k)
+			 pure ret
+--                         liftIO $ do zipWithM (\k vi -> when (k/= pi) $ setUB (objCtrs A.! k) (vi - 0.5)) [1..p] lUB
+--                                     lpSolve lp >>= getPoint lp ovars dvars p n
     where
           getPoint lp ovars dvars p n True = Just <$> (Point <$> extractPerfs lp ovars p <*> extractSol lp dvars n)
           getPoint _ _ _ _ _ _    = return Nothing

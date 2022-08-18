@@ -13,8 +13,7 @@ import           LP
 
 import           Control.Lens hiding (Empty, index)
 import           Control.Monad.State hiding (filterM)
-import qualified Data.Array.Unboxed as A
-import qualified Data.Array as AB
+import qualified Data.Array as A
 import           Data.Ix hiding (index)
 import qualified Data.List as L
 import           Data.Maybe
@@ -41,7 +40,7 @@ instance Ord PointEntry where (PointEntry v _) `compare` (PointEntry v' _) = v `
 instance Show PointEntry where show (PointEntry v l) = show v ++ " ===> " ++ show l
 
 data ModelEntry = ME {_meOpt :: !Double,
-                      _meModels :: ![[Double]]}
+                      _meModels :: ![[Value]]}
   deriving Show
 instance Eq ModelEntry where (ME o _) == (ME o' _) = o == o'
 instance Ord ModelEntry where (ME o _) `compare` (ME o' _) = o `compare` o'
@@ -53,7 +52,7 @@ data RestrictAlgorithm = RestrictAlgorithm { _raZones :: Seq SearchZone,
                                              _raRestrictModel :: RestrictLP,
                                              _raReoptModel :: AuxLP,
 
-                                             _raSolvedModels :: AB.Array Int (S.Set ModelEntry),
+                                             _raSolvedModels :: A.Array Int (S.Set ModelEntry),
 
                                              _raNad :: [Double],
 
@@ -73,17 +72,18 @@ tree <<? val = (`S.elemAt` tree) <$> S.lookupIndex val tree
 type RestrictAlgorithmT = StateT RestrictAlgorithm
 restrictSolvedPred :: (MonadIO m) =>  SearchZone -> RestrictAlgorithmT m Bool
 restrictSolvedPred sub = do 
-    trs <- AB.elems <$> use raSolvedModels
+    trs <- A.elems <$> use raSolvedModels
     test <- and <$> (forM (L.zip3 trs [1..] (A.elems $ _szUB sub)) $ \(tr,k,uk) -> check tr k uk)
     pure $ test -- && test2
-  where check tr k uk = case tr <<? (ME uk [])  of
-                          Nothing -> pure True
-                          Just (ME _ l) -> pure $ not $ or $ rmPred k <$> l
+  where check tr k M = pure True
+	check tr k (Val uk) = case tr <<? (ME uk [])  of
+				  Nothing -> pure True
+				  Just (ME _ l) -> pure $ not $ or $ rmPred k <$> l
         rmPred k ui = and $ L.zipWith (<=) (projs A.! k) ui
-        projs = AB.listArray (1,p) $ flip proj (_szUB sub) <$> [1..p]
+        projs = A.listArray (1,p) $ flip proj (_szUB sub) <$> [1..p]
         p = snd $ A.bounds (_szUB sub)
 
-addNewModel :: (Monad m) => Int -> [Double] -> Double -> RestrictAlgorithmT m ()
+addNewModel :: (Monad m) => Int -> [Value] -> Double -> RestrictAlgorithmT m ()
 addNewModel k ub yk = raSolvedModels . ix k %= addToTree
   where modelEntry = ME yk [ub]
         addToTree tr = case S.lookupIndex  modelEntry tr of
@@ -123,8 +123,8 @@ onProjOptSuccess conf k ub zrest pt
                              pure Nothing
 
  where
-       checkProj k ub pt = pointPerf pt A.! k < _szUB ub A.! k
-       computeSets zones pt' = partition (\zi -> and $ L.zipWith (<) (A.elems $ pointPerf pt') (A.elems $ _szUB zi)) zones
+       checkProj k ub pt = Val (pointPerf pt A.! k) < _szUB ub A.! k
+       computeSets zones pt' = partition (\zi -> and $ L.zipWith (<) (Val <$> (A.elems $ pointPerf pt')) (A.elems $ _szUB zi)) zones
        raReopt
                   | _cMonoLP conf = pure $ Just pt
                   | otherwise = do
@@ -136,8 +136,8 @@ minimize_rest :: (Ord a) => (x -> a) -> Seq x-> (x,Seq x)
 minimize_rest ev l = foldr f (l `index` 0, Empty) (drop 1 l)
   where f el (ret,rest) = if ev el < ev ret then (el,ret :<| rest)
                                             else (ret,el :<| rest)
-restrictAlgo :: MonadIO m => (A.UArray Int Double, A.UArray Int Double) ->  RestrictAlgorithmT m Bool
-restrictAlgo (yU,yI)  = do
+restrictAlgo :: MonadIO m => Bound ->  RestrictAlgorithmT m Bool
+restrictAlgo yI  = do
         zones <- use raZones
         conf <- use raConf
         let siz = length zones
@@ -151,26 +151,24 @@ restrictAlgo (yU,yI)  = do
                       else do
                         let 
                             (zone,zrest) = minimize_rest (snd ._szVal) zones
-                            p = snd $ A.bounds yU
+                            p = snd $ A.bounds yI
                             k = fst $ view szVal zone
 
 
                         logM $ "u=" ++ show (A.elems $ _szUB zone) ++ " k=" ++ show k 
 
                         mdl <- use raRestrictModel
-                        defpts <- liftIO $ sequence $ readIORef <$> _szDefiningPoints zone AB.! k
+                        defpts <- liftIO $ sequence $ readIORef <$> _szDefiningPoints zone A.! k
                 
                         (ret,cpu) <- time $ zoom raRestrictModel $ do
                                     let 
                                       sumComponnent pt = sum $ A.elems $ pointPerf pt
                                       cmpFun c1 c2 
-                                        |_cMonoLP conf =  scalObjValue (yU,yI) k c1 `compare` scalObjValue (yU,yI) k c2
+                                        |_cMonoLP conf =  scalObjValue yI k c1 `compare` scalObjValue yI k c2
                                         | otherwise = sumComponnent c1 `compare` sumComponnent c2
                                       candidates = L.sortBy cmpFun [ni  | ni <- defpts]
-                                    if _cMonoLP conf
-                                      then favour' (_szUB zone, _szLB zone) k
-                                      else favour k
-                                    if L.null ndpt_list || _szUB zone A.! k == yU A.! k + 1 
+                                    favour k
+                                    if L.null ndpt_list || _szUB zone A.! k == M
                                       then restrictExplore Nothing $ A.elems $ _szUB zone
                                       else do 
                                             restrictExplore (Just $ head candidates) $ A.elems $ _szUB zone
@@ -187,7 +185,7 @@ restrictAlgo (yU,yI)  = do
                                    if (isJust ptM') then
                                                         let (pt',a1,r) = fromJust $! ptM'
                                                         in do
-                                                                (subs,rest) <- liftIO $ updateSearchRegion (yU,yI) (_cEvalFun conf) (a1,r) pt'
+                                                                (subs,rest) <- liftIO $ updateSearchRegion yI (a1,r) pt'
                                                                 mdlIt <- zoom raStats $ use statsNbModelsSolved
                                                                 zoom raStats $ statsNbModelsSolved += 1
                                                                 logM $ "\t" ++ show pt'
@@ -210,23 +208,23 @@ restrictAlgo (yU,yI)  = do
     where
           logM :: MonadIO m => String -> RestrictAlgorithmT m ()
           logM = liftIO . putStrLn
-          idealZone = (buildInitZone (yU,yI)){_szUB = yI}
+          idealZone = (buildInitZone yI){_szUB = yI}
           x `dom` y = and $ zipWith (<) x y
-restrictBuildNDPT            :: Conf -> [Point] -> (A.UArray Int Double, A.UArray Int Double) -> IloEnv ->  Domain -> IO RestrictAlgorithm
-restrictBuildNDPT conf initPts (ub,ideal) env (n,p,solvars,objvars,ctrs)  = do
+restrictBuildNDPT            :: Conf -> [Point] -> Bound -> IloEnv ->  Domain -> IO RestrictAlgorithm
+restrictBuildNDPT conf initPts ideal env (n,p,solvars,objvars,ctrs)  = do
     restrict <- initRestrictLP env n p solvars objvars ctrs
     auxReopt <- initReoptAux env n p solvars objvars ctrs
-    let initZone = buildInitZone (ub,ideal)
+    let initZone = buildInitZone ideal
 
     {- Initialize with the lexicographical points -}
     ndpt <- forM initPts $ reopt auxReopt
     print initPts
 
 
-    let algo = RestrictAlgorithm (singleton initZone)  [] restrict auxReopt (A.listArray (1,p) $ repeat S.empty)  (A.elems ideal) conf initRestrictStats 
+    let algo = RestrictAlgorithm (singleton initZone)  [] restrict auxReopt (A.listArray (1,p) $ repeat S.empty)  (fromVal <$> A.elems ideal) conf initRestrictStats 
 
 
-    print (A.elems ub, A.elems ideal)
+    print (A.elems ideal)
     r <- snd <$> runStateT (do 
                           when (_cComputeNad conf) $ raNad .= computeNad ndpt
                           when (_cMonoLP conf) $ void $ runStateT initMono restrict
@@ -235,17 +233,17 @@ restrictBuildNDPT conf initPts (ub,ideal) env (n,p,solvars,objvars,ctrs)  = do
     pure r
  where rec' lmc = do
                      liftIO $ resetDoubles lmc
-                     r <- restrictAlgo (ub,ideal)
+                     r <- restrictAlgo ideal
                      if r then rec'  lmc else pure ()
-       rec = do r <- restrictAlgo (ub,ideal)
+       rec = do r <- restrictAlgo ideal
                 if r
                   then rec
                   else do
                        pure ()
        n `domL` n' = and $ L.zipWith (<=) (A.elems $ pointPerf n) (A.elems $ pointPerf n')
-buildInitZone :: (Bound,Bound) -> SearchZone
-buildInitZone (ub,ideal) = SZ (A.listArray (1,p) ((+1) <$> A.elems ub)) ideal  (1,0) (AB.listArray (1,p) (repeat [])) 
-  where p = snd $ A.bounds ub
+buildInitZone ::  Bound -> SearchZone
+buildInitZone yI = SZ (A.listArray (1,p) $ Prelude.take p (repeat M)) yI (1,(p,0)) (A.listArray (1,p) (repeat [])) 
+  where (1,p) = A.bounds yI
 
 time :: (MonadIO m) => m a -> m (a, Double)
 time act = do cpu <- liftIO getCPUTime
