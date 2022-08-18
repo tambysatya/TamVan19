@@ -1,6 +1,6 @@
 module Design where
 
-import qualified Data.Array.Unboxed as A
+import qualified Data.Array as A
 import Data.Maybe
 import Control.Monad.State
 import Control.DeepSeq
@@ -10,7 +10,7 @@ import LP
 
 type Perfs = A.Array Int Double
 
-data Point = Point {-#UNPACK #-} !(A.UArray Int Double) !(A.UArray Int Double)
+data Point = Point {-#UNPACK #-} !(A.Array Int Double) !(A.Array Int Double)
 pointPerf (Point pt _) = pt
 pointSol (Point _ pt) = pt
 instance Show Point where 
