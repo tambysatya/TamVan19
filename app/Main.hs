@@ -45,6 +45,14 @@ main = do
       (retN,total) <- time $ mainloop conf env dom
       appendFile logfile (show n ++ ";" ++ show p ++ ";" ++ i ++";"++ _cName conf ++";" ++ show total ++ ";" ++  show (_raStats retN) ++  "\t#" ++ ins++"\n")
       writeFile "ndpts" $ show $ _raNDPT_List retN
+    ["SparseMODO",confstyle,i,ins,logfile] -> do
+      let conf= if confstyle == "twostage" then confMaxHV else monoConf confMaxHV
+      dom@(n,p,_,_,_) <- readSparseDomain ins env
+      (retN,total) <- time $ mainloop conf env dom
+      appendFile logfile (show n ++ ";" ++ show p ++ ";" ++ i ++";"++ _cName conf ++";" ++ show total ++ ";" ++  show (_raStats retN) ++  "\t#" ++ ins++"\n")
+      writeFile "ndpts" $ show $ _raNDPT_List retN
+
+
 
 
     otherwise -> putStrLn $ "syntax: ./main KP/AP/MODO confstyle i instance logfile"

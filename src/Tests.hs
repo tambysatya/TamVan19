@@ -114,3 +114,43 @@ readMultiDimKS infile env = do x <- readFile infile
                                    weights = read $ last rest
                                buildDomain env (read n) (read p) costs (repeat 0) weights (read w)
 
+readSparseDomain :: String -> IloEnv -> IO Domain
+readSparseDomain fname env = do x <- readFile fname
+				let (p_:n_:objs_:lbs_:ctrs_:ubs_) = lines x
+				    (p,n,objs,lbs,ctrs,ubs) = (read p_, read n_, read objs_, read lbs_, read ctrs_, read $ unlines ubs_)
+					
+				(ovars, dvars) <- buildVars p n
+				objsctrs <- buildObjCtrs objs ovars dvars
+				matctrs <- buildDomCtrs lbs ctrs ubs dvars
+				pure (n,p, A.elems dvars, ovars, matctrs ++ objsctrs)
+	where buildVars :: Int -> Int -> IO ([IloNumVar], A.Array Int IloBoolVar)
+	      buildVars p n = do
+			(objvars, dvars) <- (,) <$> forM [1..p] (pure $ newIloObject env) <*> forM [1..n] (pure $ newIloObject env)
+			pure (objvars, A.listArray (1,n) dvars)
+	      buildExpr dvars coefs expr = forM coefs $ \(ai,xi) -> do
+						setLinearCoef expr (dvars A.! xi) ai
+	      buildObjCtrs :: [[(Double,Int)]] -> [IloNumVar] -> A.Array Int IloBoolVar -> IO [IloRange]
+	      buildObjCtrs objcoefs ovars dvars = forM (zip objcoefs ovars) $ \(fi,oi) -> do
+							ctr <- newIloObject env
+							setLinearCoef ctr oi (-1)
+							setBounds ctr (0,0)
+							buildExpr dvars fi ctr
+						        pure ctr
+
+	      buildDomCtrs :: [Double] -> [[(Double,Int)]] -> [Double] -> A.Array Int IloBoolVar -> IO [IloRange]
+	      buildDomCtrs lbs domcoefs ubs dvars = forM (zip3 lbs domcoefs ubs) $ \(lb,fi,ub) -> do
+											ctr <- newIloObject env
+											setBounds ctr (lb,ub)
+											buildExpr dvars fi ctr
+											pure ctr
+							
+	     {-
+	      buildObjCtrs objcoefs ovars dvars = forM (zip objcoef ovars) $ \(fi, oi) -> do
+							ctr <- newIloObject env
+							setLinearCoef ctr oi (-1)
+							forM_ fi $ \(xi, ci) -> do
+								setLinearCoef 
+-}
+	      
+
+
